@@ -9,57 +9,65 @@
 // source (each keyvalue pair from the scoreObject OR sourceArray )
 
 
-results = [ //input
-    {  
-    "category":"Red",
-    "source1":20,
-    "source2":30,
-    "source3":40,
-    "source4":50 }, // 140 => final_rank: 1
-    { 
-    "category":"Yellow",
-    "source1":30,
-    "source2":10,
-    "source3":40,
-    "source4":50 } // 130  => final_rank: 2
-] 
+results = [
+    {
+    "category":"cat1",
+    "src1":20,
+    "src2":30,
+    "src3":40,
+    "src4":50,
+    "src5":50
+    },
+    {
+    "category":"cat1",
+    "src1":10,
+    "src2":0,
+    "src3":20,
+    "src4":20,
+    "src5":100
+    }
+    ]
 
-
-///Exercise begins
-
-let output = 
-    results.map((scoreObject) => {
-        let total_score = 0;
-        //declaring a new object to populate
-        let newSourceObject = {}
-        newSourceObject.category = scoreObject.category
-
-        
-    //CALCULATING TOTAL SCORE & CREATING SOURCE ARRAY
-       let sourceArray = [];
-        Object.keys(scoreObject).forEach((key) => {
-            if (key !== 'category') {
-                total_score = total_score + scoreObject[key]
-                sourceArray.push([key, scoreObject[key]])
-            }
-        })
-
-    //ASSIGNING RANKS BASED ON SCORE  
-        sourceArray.forEach((source) => {
-            //we take each score array
-            let rank = 1
-            for (let i = 0; i < sourceArray.length; i++) {
-                if (sourceArray[i][1] > source[1]) {
-                    rank++
-                }
-            }
-        //adding each source to the new object with its rank   
-        newSourceObject[source[0]] = rank
-        })
-      //adding total score to the new object
-      newSourceObject.total_score = total_score
-      //output.push(newSourceObject)
-      return newSourceObject
+////////////////////////////////
+let calculatedScoreObjects = 
+results.map((scoreObject) => {
+    let final_rank = 0;
+    let newSourceObject = {}        //declaring a new object to populate
+    newSourceObject.category = scoreObject.category     //adding the category to the new object
+      
+    //STEP 1 - CALCULATE TOTAL SCORE & SCORE RANKS FOR EACH OBJECT
+    Object.keys(scoreObject).forEach((key) => {
+      let rank = 1
+      if (key !== 'category') {
+        final_rank = final_rank + scoreObject[key]  //Adding up the score.
+        newSourceObject[key] = calculateSourceRank(scoreObject, rank, key) //calculating the rank of each source
+      }
     })
+    newSourceObject.final_rank = final_rank //adding total_score prop to the new object
+    return newSourceObject
+})
+    
+//to calculate each source rank
+function calculateSourceRank(scoreObject, rank, key) {
+    for (let i = 1; i < Object.keys(scoreObject).length; i++) {
+      if (scoreObject[Object.keys(scoreObject)[i]] > scoreObject[key]) {
+        rank++
+      }
+    } 
+   return rank
+}
 
+//STEP 2 - COMPARE OBJECTS FOR FINAL RANK
+let output = calculatedScoreObjects.map((object) => {
+    let rank = 1;
+    for (let i = 0; i < calculatedScoreObjects.length; i++) {
+        if (calculatedScoreObjects[i].final_rank > object.final_rank) {
+          rank++
+        }
+        object.final_rank = rank
+      } 
+  return object
+})
+
+//console.log(calculatedScoreObjects)
 console.log(output)
